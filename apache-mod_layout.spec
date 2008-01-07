@@ -1,13 +1,13 @@
 #Module-Specific definitions
-%define apache_version 2.2.4
+%define apache_version 2.2.6
 %define mod_name mod_layout
 %define mod_conf 15_%{mod_name}.conf
 %define mod_so %{mod_name}.so
 
 Summary:	Add custom header and/or footers for apache
 Name:		apache-%{mod_name}
-Version:	5.0
-Release:	%mkrel 6
+Version:	5.1
+Release:	%mkrel 1
 Group:		System/Servers
 License:	BSD-style
 URL:		http://software.tangent.org/
@@ -69,11 +69,11 @@ install -m0755 .libs/*.so %{buildroot}%{_libdir}/apache-extramodules/
 install -m0644 %{mod_conf} %{buildroot}%{_sysconfdir}/httpd/modules.d/%{mod_conf}
 
 install -d %{buildroot}%{_var}/www/html/addon-modules
-ln -s ../../../..%{_docdir}/%{name}-%{version} %{buildroot}%{_var}/www/html/addon-modules/%{name}-%{version}
+ln -s ../../../..%{_docdir}/%{name} %{buildroot}%{_var}/www/html/addon-modules/%{name}
 
 # make the example work... (ugly, but it works...)
 
-NEW_URL=/addon-modules/%{name}-%{version}/index.html
+NEW_URL=/addon-modules/%{name}/index.html
 perl -pi -e "s|_REPLACE_ME_|$NEW_URL|g" %{buildroot}%{_sysconfdir}/httpd/modules.d/%{mod_conf}
 
 %post

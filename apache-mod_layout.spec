@@ -7,7 +7,7 @@
 Summary:	Add custom header and/or footers for apache
 Name:		apache-%{mod_name}
 Version:	5.1
-Release:	%mkrel 2
+Release:	%mkrel 3
 Group:		System/Servers
 License:	BSD-style
 URL:		http://software.tangent.org/
@@ -21,7 +21,7 @@ Requires(pre):  apache >= %{apache_version}
 Requires:	apache-conf >= %{apache_version}
 Requires:	apache >= %{apache_version}
 BuildRequires:  apache-devel >= %{apache_version}
-BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 Mod_Layout creates a framework for doing design. Whether you need a simple

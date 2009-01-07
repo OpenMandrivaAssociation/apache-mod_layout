@@ -7,13 +7,12 @@
 Summary:	Add custom header and/or footers for apache
 Name:		apache-%{mod_name}
 Version:	5.1
-Release:	%mkrel 4
+Release:	%mkrel 5
 Group:		System/Servers
 License:	BSD-style
 URL:		http://software.tangent.org/
 Source0:	http://download.tangent.org/%{mod_name}-%{version}.tar.gz
 Source1:	%{mod_conf}
-Patch0:		mod_layout-register.diff
 Requires(pre): rpm-helper
 Requires(postun): rpm-helper
 Requires(pre):  apache-conf >= %{apache_version}
@@ -35,7 +34,6 @@ creating large custom portal sites.
 %prep
 
 %setup -q -n %{mod_name}-%{version}
-%patch0 -p0
 
 cp %{SOURCE1} %{mod_conf}
 

@@ -1,26 +1,20 @@
 #Module-Specific definitions
-%define apache_version 2.2.6
+%define apache_version 2.4.0
 %define mod_name mod_layout
-%define mod_conf 15_%{mod_name}.conf
-%define mod_so %{mod_name}.so
 
 Summary:	Add custom header and/or footers for apache
 Name:		apache-%{mod_name}
 Version:	5.1
-Release:	%mkrel 12
+Release:	13
 Group:		System/Servers
 License:	BSD-style
 URL:		http://software.tangent.org/
 Source0:	http://download.tangent.org/%{mod_name}-%{version}.tar.gz
-Source1:	%{mod_conf}
+Source1:	115_mod_layout.conf
 Requires(pre): rpm-helper
 Requires(postun): rpm-helper
-Requires(pre):  apache-conf >= %{apache_version}
-Requires(pre):  apache >= %{apache_version}
-Requires:	apache-conf >= %{apache_version}
 Requires:	apache >= %{apache_version}
 BuildRequires:  apache-devel >= %{apache_version}
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 Mod_Layout creates a framework for doing design. Whether you need a simple
@@ -35,63 +29,29 @@ creating large custom portal sites.
 
 %setup -q -n %{mod_name}-%{version}
 
-cp %{SOURCE1} %{mod_conf}
+cp %{SOURCE1} 115_mod_layout.conf
+perl -pi -e "s|_MODULE_DIR_|%{_libdir}/apache|g" 115_mod_layout.conf
 
 %build
-
-%{_sbindir}/apxs -c mod_layout.c utility.c layout.c
-
-cat > index.html <<EOF
-
-<p>No documentation exists yet for this module, go to 
-<a href="http://software.tangent.org/">tangent.org</a> 
-for more information</p>
-
-<p>Meanwhile take a look at the %{_sysconfdir}/httpd/modules.d/%{mod_conf} file</p>
-
-<p>Also please take the time to check out the 
-<a href=http://nux.se/apache/>modules for apache</a> 
-repository for Mandriva Linux.</p>
-
-<-- replace_me -->
-
-EOF
+apxs -c mod_layout.c utility.c layout.c
 
 %install
-[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 
-install -d %{buildroot}%{_libdir}/apache-extramodules
+install -d %{buildroot}%{_libdir}/apache
 install -d %{buildroot}%{_sysconfdir}/httpd/modules.d
 
-install -m0755 .libs/*.so %{buildroot}%{_libdir}/apache-extramodules/
-install -m0644 %{mod_conf} %{buildroot}%{_sysconfdir}/httpd/modules.d/%{mod_conf}
-
-install -d %{buildroot}%{_var}/www/html/addon-modules
-ln -s ../../../..%{_docdir}/%{name} %{buildroot}%{_var}/www/html/addon-modules/%{name}
-
-# make the example work... (ugly, but it works...)
-
-NEW_URL=/addon-modules/%{name}/index.html
-perl -pi -e "s|_REPLACE_ME_|$NEW_URL|g" %{buildroot}%{_sysconfdir}/httpd/modules.d/%{mod_conf}
+install -m0755 .libs/mod_layout.so %{buildroot}%{_libdir}/apache/
+install -m0644 115_mod_layout.conf %{buildroot}%{_sysconfdir}/httpd/modules.d/
 
 %post
-if [ -f %{_var}/lock/subsys/httpd ]; then
-    %{_initrddir}/httpd restart 1>&2;
-fi
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
 %postun
 if [ "$1" = "0" ]; then
-    if [ -f %{_var}/lock/subsys/httpd ]; then
-        %{_initrddir}/httpd restart 1>&2
-    fi
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 fi
 
-%clean
-[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
-
 %files
-%defattr(-,root,root)
-%doc ChangeLog INSTALL README index.html
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/httpd/modules.d/%{mod_conf}
-%attr(0755,root,root) %{_libdir}/apache-extramodules/%{mod_so}
-%{_var}/www/html/addon-modules/*
+%doc ChangeLog INSTALL README
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/httpd/modules.d/*.conf
+%attr(0755,root,root) %{_libdir}/apache/mod_layout.so

@@ -1,6 +1,7 @@
 #Module-Specific definitions
 %define apache_version 2.4.0
 %define mod_name mod_layout
+%define load_order 115
 
 Summary:	Add custom header and/or footers for apache
 Name:		apache-%{mod_name}
@@ -10,7 +11,6 @@ Group:		System/Servers
 License:	BSD-style
 URL:		http://software.tangent.org/
 Source0:	http://download.tangent.org/%{mod_name}-%{version}.tar.gz
-Source1:	115_mod_layout.conf
 Requires(pre): rpm-helper
 Requires(postun): rpm-helper
 Requires:	apache >= %{apache_version}
@@ -23,14 +23,12 @@ challenging such a custom look and feel for a site that employs an array of
 technologies (Java Servlets, mod_perl, PHP, CGI's, static HTML, etc...),
 Mod_Layout creates a framework for such an environment. By allowing you to
 cache static components and build sites in pieces, it gives you the tools for
-creating large custom portal sites. 
+creating large custom portal sites.
 
 %prep
 
 %setup -q -n %{mod_name}-%{version}
 
-cp %{SOURCE1} .
-perl -pi -e "s|_MODULE_DIR_|%{_libdir}/apache|g" *.conf
 
 %build
 apxs -c mod_layout.c utility.c layout.c
@@ -41,7 +39,10 @@ install -d %{buildroot}%{_libdir}/apache
 install -d %{buildroot}%{_sysconfdir}/httpd/modules.d
 
 install -m0755 .libs/*.so %{buildroot}%{_libdir}/apache/
-install -m0644 *.conf %{buildroot}%{_sysconfdir}/httpd/modules.d/
+
+cat > %{buildroot}%{_sysconfdir}/httpd/modules.d/%{load_order}_%{mod_name}.conf << EOF
+LoadModule layout_module %{_libdir}/%{mod_name}.so
+EOF
 
 %post
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :

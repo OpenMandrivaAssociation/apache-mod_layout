@@ -5,7 +5,7 @@
 Summary:	Add custom header and/or footers for apache
 Name:		apache-%{mod_name}
 Version:	5.1
-Release:	13
+Release:	14
 Group:		System/Servers
 License:	BSD-style
 URL:		http://software.tangent.org/
@@ -29,8 +29,8 @@ creating large custom portal sites.
 
 %setup -q -n %{mod_name}-%{version}
 
-cp %{SOURCE1} 115_mod_layout.conf
-perl -pi -e "s|_MODULE_DIR_|%{_libdir}/apache|g" 115_mod_layout.conf
+cp %{SOURCE1} .
+perl -pi -e "s|_MODULE_DIR_|%{_libdir}/apache|g" *.conf
 
 %build
 apxs -c mod_layout.c utility.c layout.c
@@ -40,8 +40,8 @@ apxs -c mod_layout.c utility.c layout.c
 install -d %{buildroot}%{_libdir}/apache
 install -d %{buildroot}%{_sysconfdir}/httpd/modules.d
 
-install -m0755 .libs/mod_layout.so %{buildroot}%{_libdir}/apache/
-install -m0644 115_mod_layout.conf %{buildroot}%{_sysconfdir}/httpd/modules.d/
+install -m0755 .libs/*.so %{buildroot}%{_libdir}/apache/
+install -m0644 *.conf %{buildroot}%{_sysconfdir}/httpd/modules.d/
 
 %post
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
@@ -54,4 +54,4 @@ fi
 %files
 %doc ChangeLog INSTALL README
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/httpd/modules.d/*.conf
-%attr(0755,root,root) %{_libdir}/apache/mod_layout.so
+%attr(0755,root,root) %{_libdir}/apache/*.so

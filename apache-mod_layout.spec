@@ -7,7 +7,7 @@
 Summary:	Add custom header and/or footers for apache
 Name:		apache-%{mod_name}
 Version:	5.1
-Release:	15
+Release:	16
 Group:		System/Servers
 License:	BSD-style
 URL:		http://software.tangent.org/

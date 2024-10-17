@@ -10,7 +10,7 @@ Version:	5.1
 Release:	23
 Group:		System/Servers
 License:	BSD-style
-URL:		http://software.tangent.org/
+URL:		https://software.tangent.org/
 Source0:	http://download.tangent.org/%{mod_name}-%{version}.tar.gz
 Source1:	%{mod_conf}
 Requires(pre): rpm-helper
